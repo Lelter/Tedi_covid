@@ -1,31 +1,16 @@
-# %%
-
 import pandas as pd
+shengfen = pd.read_excel("附件1.xlsx", sheet_name="城市省份对照表")
+data = pd.read_csv("result/1_1.csv")
+result = pd.DataFrame(columns=['日期', '省份', '新增确诊'])
+# '新增治愈', '新增死亡', '累计确诊', '累计治愈', '累计死亡']
+for cheng in data.itertuples():
+    for sheng in shengfen.itertuples():
+        # print(sheng["城市"])
 
-path = "附件1.xlsx"
+        if cheng.城市 == sheng.城市:
+            if result.loc(result["省份"]==result[sheng.省份]):
+                dic = {"日期": cheng.日期, "省份": sheng.省份, '新增确诊': result[sheng.省份].新增确诊 + cheng.新增确诊
+                       }
+                result.append(dic)
 
-data = pd.read_excel(path)
-
-data = data.groupby("城市")
-
-
-def leijia(x):
-    x["累计确诊"] = x['新增确诊'].cumsum()
-    x["累计治愈"] = x['新增治愈'].cumsum()
-    x["累计死亡"] = x['新增死亡'].cumsum()
-    return x
-    pass
-
-
-data = data.apply(leijia)
-
-data.to_csv("result/1_1.csv")
-
-# %%
-
-data = data.groupby("城市")
-data_wuhan = data.get_group("武汉")
-data_shenzhen = data.get_group("深圳")
-data_baoding = data.get_group("保定")
-
-data_wuhan.loc(data_wuhan["日期"].str.contains("25"))
+print(result)
